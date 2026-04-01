@@ -1,0 +1,168 @@
+---
+title: Integrations and Extensions
+description: Explore how Pipeops connects with third-party services, Git providers, and webhooks to enhance your DevOps workflow.
+---
+
+## Overview
+
+Pipeops integrates seamlessly with popular Git providers, notification services, and databases to streamline your deployment pipelines. You configure these integrations directly from the dashboard at `https://dashboard.pipeops.io/integrations`. This guide covers GitHub and GitLab setups, webhook notifications, third-party database connections, and custom extensions.
+
+<Callout kind="info">
+  Enable integrations one at a time to avoid configuration conflicts. Test each connection after setup.
+</Callout>
+
+## Git Provider Integrations
+
+Connect your repositories from GitHub or GitLab to trigger automatic deployments on push events.
+
+<Tabs>
+  <Tab title="GitHub" icon="github">
+
+    Follow these steps to link your GitHub account.
+
+    <Steps>
+      <Step title="Authorize Pipeops" icon="key">
+        Navigate to `https://dashboard.pipeops.io/integrations/github` and click "Connect GitHub".
+      </Step>
+      <Step title="Select Repositories" icon="git-branch">
+        Grant access to specific repositories or your entire organization.
+      </Step>
+      <Step title="Configure Webhook" icon="zap">
+        Pipeops automatically installs a webhook. Verify it at `https://github.com/owner/repo/settings/hooks`.
+      </Step>
+    </Steps>
+
+  </Tab>
+  <Tab title="GitLab" icon="git-fork">
+
+    Link your GitLab projects for CI/CD automation.
+
+    <Steps>
+      <Step title="Generate Token" icon="key">
+        Create a personal access token in GitLab with `api` and `read_repository` scopes.
+      </Step>
+      <Step title="Add to Pipeops" icon="plus">
+        Enter the token at `https://dashboard.pipeops.io/integrations/gitlab`.
+      </Step>
+      <Step title="Sync Projects" icon="refresh-cw">
+        Pipeops pulls your projects. Select which ones to monitor.
+      </Step>
+    </Steps>
+
+  </Tab>
+</Tabs>
+
+## Webhook Configuration
+
+Set up webhooks to receive deployment notifications in tools like Slack or Discord.
+
+<Columns cols={2}>
+  <Card title="Incoming Webhooks" icon="arrow-down-circle" href="https://dashboard.pipeops.io/integrations/webhooks/incoming">
+    Receive events from Pipeops on your endpoint.
+  </Card>
+  <Card title="Outgoing Webhooks" icon="arrow-up-circle" href="https://dashboard.pipeops.io/integrations/webhooks/outgoing">
+    Send Pipeops events to external services.
+  </Card>
+</Columns>
+
+Configure an incoming webhook with this example payload:
+
+<CodeGroup tabs="JavaScript,Python">
+  ```javascript
+  const express = require('express');
+  const app = express();
+  app.use(express.json());
+
+  app.post('/pipeops-webhook', (req, res) => {
+    console.log('Deployment event:', req.body.event);
+    // Handle success/failure notifications
+    res.status(200).send('OK');
+  });
+
+  app.listen(3000, () => console.log('Webhook ready'));
+  ```
+  ```python
+  from flask import Flask, request, jsonify
+
+  app = Flask(__name__)
+
+  @app.route('/pipeops-webhook', methods=['POST'])
+  def webhook():
+      data = request.json
+      print(f'Deployment event: {data.get("event")}')
+      # Handle notifications
+      return jsonify({'status': 'OK'}), 200
+
+  if __name__ == '__main__':
+      app.run(port=3000)
+  ```
+</CodeGroup>
+
+Add your endpoint URL and secret at `https://dashboard.pipeops.io/integrations/webhooks`. Use `YOUR_WEBHOOK_SECRET` for HMAC verification.
+
+<Callout kind="tip">
+  Always validate webhook signatures to prevent unauthorized requests. Compute HMAC-SHA256 with your secret.
+</Callout>
+
+## Third-Party Database Connections
+
+Pipeops supports direct connections to databases for data-backed deployments.
+
+| Service     | Connection String Example                  | Supported Engines          |
+|-------------|--------------------------------------------|----------------------------|
+| PostgreSQL | `postgres://user:PASSWORD@host:5432/dbname` | 12+, 13+, 14+, 15         |
+| MySQL      | `mysql://user:PASSWORD@host:3306/dbname`   | 5.7+, 8.0+                |
+| MongoDB    | `mongodb://user:PASSWORD@host:27017/dbname`| 4.4+, 5.0+, 6.0+, 7.0     |
+
+<ParamField header="DATABASE_URL" param-type="string" required="true">
+  Full connection string with credentials.
+</ParamField>
+
+## Custom Extensions
+
+Develop custom integrations using Pipeops's extension API.
+
+<Expandable title="Extension Development Guide" default-open="false">
+
+Create extensions with our SDK.
+
+```bash
+npm install @pipeops/sdk
+```
+
+```javascript
+import { Extension } from '@pipeops/sdk';
+
+const ext = new Extension({
+  name: 'my-custom-extension',
+  version: '1.0.0'
+});
+
+ext.on('deploy:success', (event) => {
+  console.log('Deployment succeeded:', event.payload);
+});
+
+ext.register();
+```
+
+Publish to `https://extensions.pipeops.io`.
+
+</Expandable>
+
+## Next Steps
+
+<Columns cols={3}>
+  <Card title="Deployment Guides" icon="book-open" href="/docs/how-to-guides/deployment-templates">
+    Deploy React, Vue, or Next.js apps.
+  </Card>
+  <Card title="Changelog" icon="git-commit" href="/docs/changelogs">
+    Stay updated with latest releases.
+  </Card>
+  <Card title="Support" icon="help-circle" href="https://pipeops.io/support" target="_blank">
+    Get help from our community.
+  </Card>
+</Columns>
+
+<Callout kind="success">
+  Your Pipeops workflow is now supercharged with integrations. Explore more in the dashboard.
+</Callout>

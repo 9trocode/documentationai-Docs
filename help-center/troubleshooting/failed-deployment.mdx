@@ -1,0 +1,31 @@
+---
+title: Failed Deployment
+description: Resolve deployment failures in Pipeops.
+---
+
+## Symptoms
+
+- Deployments show "failed" status
+- Error: "Build error" in logs
+
+## Common Causes
+
+- Invalid environment variables
+- Missing Dockerfile or config
+
+## Quick Fix
+
+<Steps>
+  <Step title="Check logs">
+    ````bash
+    # In Pipeops dashboard
+    View build logs for error details.
+    ````
+  </Step>
+  <Step title="Correct config">
+    Ensure Dockerfile and config files exist and are valid.
+  </Step>
+  <Step title="Redeploy">
+    Retry deployment after fixing issues.
+  </Step>
+</Steps>

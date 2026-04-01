@@ -1,0 +1,125 @@
+---
+title: Changelog
+description: Track the latest updates, new features, and improvements in Pipeops to stay current with platform enhancements.
+---
+
+## Recent Updates
+
+Stay informed about Pipeops releases. You receive notifications for major updates through your dashboard, and check this page for detailed changelogs. Each release includes new features, framework support, bug fixes, and performance improvements.
+
+<Update label="2024-10-15" description="v1.2.0" tags={["feature", "improvement"]}>
+
+## New Features
+
+- Added support for deploying Golang applications with one-click templates.
+- Introduced real-time deployment logs for better monitoring.
+- New webhook integration for custom notifications.
+
+## Improvements
+
+- Enhanced dashboard performance by `>30%` for faster page loads.
+- Updated UI components with improved accessibility.
+
+## Bug Fixes
+
+- Fixed intermittent deployment failures on high-traffic projects.
+- Resolved configuration sync issues with Git repositories.
+
+</Update>
+
+<Update label="2024-09-20" description="v1.1.0" tags={["feature", "bugfix"]}>
+
+## New Features
+
+- Native support for Django templates with auto-environment setup.
+- Added Laravel deployment presets for PHP projects.
+
+## Bug Fixes
+
+- Corrected Vue.js build errors during static site generation.
+- Fixed Next.js server-side rendering compatibility issues.
+
+## Improvements
+
+- Streamlined React.js deployments with optimized caching.
+
+</Update>
+
+<Update label="2024-08-10" description="v1.0.0" tags={["feature", "breaking"]}>
+
+## New Features
+
+- Core deployment engine for React.js, Vue.js, Next.js, PHP, and Laravel.
+- Custom domain management and SSL auto-provisioning.
+- Git-based continuous deployment workflows.
+
+## Breaking Changes
+
+- Updated API authentication to use `{API_KEY}` headers exclusively.
+
+## Initial Setup Example
+
+To upgrade to v1.0.0, update your project settings:
+
+````bash
+pipeops deploy --version 1.0.0 --token YOUR_TOKEN
+````
+
+</Update>
+
+## Framework Deployment Templates
+
+Pipeops now supports more frameworks out-of-the-box. Use these templates to deploy quickly.
+
+<Columns cols={3}>
+  <Card title="React.js" icon="code" href="/docs/how-to-guides/deployment-templates/deploy-react-template">
+    Deploy SPAs with automatic bundling and CDN distribution.
+  </Card>
+  <Card title="Next.js" icon="zap" href="/docs/how-to-guides/deployment-templates/deploy-nextjs-template">
+    Full-stack deployments with SSR and API routes.
+  </Card>
+  <Card title="Laravel" icon="database" href="/docs/how-to-guides/deployment-templates/deploy-php-laravel-template">
+    PHP backend with database migrations and queue workers.
+  </Card>
+</Columns>
+
+<Callout kind="tip">
+  Enable auto-updates in your project settings to receive minor releases automatically. Major releases require manual confirmation.
+</Callout>
+
+## Upcoming Features
+
+<Expandable title="Preview: v1.3.0 (Coming Soon)" default-open="false">
+
+You can preview upcoming changes:
+
+- Docker container support for custom runtimes.
+- Multi-region deployments.
+- Advanced analytics dashboard.
+
+Follow [GitHub](https://github.com/pipeops-dev) for beta access.
+
+</Expandable>
+
+## How to Stay Updated
+
+<Steps>
+  <Step title="Subscribe to Releases" icon="bell">
+    Visit your dashboard notifications and enable changelog emails.
+  </Step>
+  <Step title="Check GitHub" icon="github">
+    Watch the repository for commit updates.
+  </Step>
+  <Step title="Review This Page" icon="book-open">
+    Bookmark this changelog for version comparisons.
+  </Step>
+</Steps>
+
+<Tabs>
+  <Tab title="Major Releases" icon="git-branch">
+    Focus on breaking changes and new major features.
+  </Tab>
+  <Tab title="Patch Releases" icon="bug">
+    Quick bug fixes and minor improvements.
+  </Tab>
+</Tabs>

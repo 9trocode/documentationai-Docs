@@ -1,0 +1,142 @@
+---
+title: Getting Started with Pipeops
+description: Set up your Pipeops account and deploy your first application in minutes using our intuitive no-code interface.
+---
+
+## Prerequisites
+
+Before deploying your first app with Pipeops, ensure you have the following:
+
+<Callout kind="info">
+
+- A free GitHub account (sign up at `https://github.com` if needed)
+- A GitHub repository with your application code (supports React, Next.js, Vue.js, PHP, Laravel, Django, and more)
+- Basic familiarity with Git (pushing code to repositories)
+
+</Callout>
+
+Pipeops uses your GitHub repo to automatically build and deploy apps via no-code pipelines.
+
+## Step 1: Create Your Pipeops Account
+
+Sign up for Pipeops to access the dashboard.
+
+<Steps>
+  <Step title="Visit Pipeops" icon="globe">
+    Navigate to `https://app.pipeops.io/signup` and click **Sign Up**.
+  </Step>
+  <Step title="Enter Details" icon="user">
+    Provide your email, password, and verify via the confirmation link sent to your inbox.
+  </Step>
+  <Step title="Complete Onboarding" icon="check-circle">
+    Select your preferred frameworks during onboarding and access the dashboard.
+  </Step>
+</Steps>
+
+## Step 2: Connect Your GitHub Repository
+
+Link your GitHub account to import repos seamlessly.
+
+<Steps>
+  <Step title="Authorize GitHub" icon="github">
+    In the Pipeops dashboard, go to **Integrations > GitHub** and click **Connect**.
+  </Step>
+  <Step title="Grant Permissions" icon="key">
+    Authorize Pipeops to access your repositories (read-only for deployment).
+  </Step>
+  <Step title="Select Repo" icon="git-branch">
+    Choose your app repository from the list.
+  </Step>
+</Steps>
+
+## Step 3: Configure Your Deployment Pipeline
+
+Pipeops auto-detects your framework and sets up pipelines.
+
+<Tabs>
+  <Tab title="React" icon="react">
+    Select **React** template. Pipeops configures build (`npm run build`) and serve commands automatically.
+    
+    <CodeGroup tabs="package.json,build-config">
+    ````json
+    {
+      "name": "my-react-app",
+      "scripts": {
+        "build": "react-scripts build",
+        "start": "react-scripts start"
+      }
+    }
+    ````
+    ````yaml
+    # Pipeops auto-generates this
+    build:
+      command: npm install && npm run build
+    serve:
+      command: npx serve -s build
+    ````
+    </CodeGroup>
+  </Tab>
+  <Tab title="Next.js" icon="nextjs">
+    Choose **Next.js** for SSR support. Enable static export if needed.
+    
+    <CodeGroup tabs="next.config.js">
+    ````javascript
+    /** @type {import('next').NextConfig} */
+    const nextConfig = {
+      output: 'export',
+    };
+    module.exports = nextConfig;
+    ````
+    </CodeGroup>
+  </Tab>
+  <Tab title="Vue.js" icon="vue">
+    Pipeops handles Vite or Vue CLI builds.
+  </Tab>
+</Tabs>
+
+<Callout kind="tip">
+  Pipeops detects your framework from `package.json` or other files. Customize pipelines in **Project Settings > Deployment**.
+</Callout>
+
+## Step 4: Launch Your Sample App
+
+Push changes to trigger deployment.
+
+<Steps>
+  <Step title="Push Code" icon="git-commit">
+    Commit and push to your GitHub repo's `main` branch:
+    
+    ````bash
+    git add .
+    git commit -m "Initial deploy"
+    git push origin main
+    ````
+  </Step>
+  <Step title="Monitor Build" icon="activity">
+    Watch real-time logs in the Pipeops dashboard under **Deployments**.
+  </Step>
+  <Step title="Access Live App" icon="external-link">
+    Once deployed, click **Visit Site** for your live URL (e.g., `https://your-app.pipeops.app`).
+  </Step>
+</Steps>
+
+## Next Steps
+
+Explore more with Pipeops.
+
+<Columns cols={2}>
+  <Card title="Guides & Tutorials" icon="book-open" href="/guides">
+    Dive into advanced deployments for Laravel, Django, and custom pipelines.
+  </Card>
+  <Card title="Changelogs" icon="git-commit" href="/changelog">
+    Stay updated with the latest features and improvements.
+  </Card>
+  <Card title="Overview" icon="info" href="/introduction">
+    Learn core concepts and supported frameworks.
+  </Card>
+  <Card title="Community" icon="users" href="https://github.com/pipeops-dev" target="_blank">
+    Join discussions and contribute.
+  </Card>
+</Columns>
+
+Your first app is live! Customize pipelines for CI/CD, environments, and scaling as needed.
