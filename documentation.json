@@ -23,6 +23,11 @@
             "icon": "rocket",
             "pages": [
               {
+                "title": "Overview",
+                "path": "overview",
+                "icon": "home"
+              },
+              {
                 "title": "Introduction",
                 "path": "introduction",
                 "icon": "home"
@@ -31,6 +36,36 @@
                 "title": "Quickstart",
                 "path": "quickstart",
                 "icon": "zap"
+              },
+              {
+                "title": "Getting Started",
+                "path": "getting-started",
+                "icon": "rocket"
+              },
+              {
+                "title": "User Registration Guide",
+                "path": "getting-started/user-registration",
+                "icon": "users"
+              },
+              {
+                "title": "Choose Your Deployment Path",
+                "path": "getting-started/choose-your-deployment-path",
+                "icon": "compass"
+              },
+              {
+                "title": "On PipeOps",
+                "path": "getting-started/choose-your-deployment-path/on-pipeops",
+                "icon": "cloud"
+              },
+              {
+                "title": "On Cloud Provider",
+                "path": "getting-started/choose-your-deployment-path/on-cloud-provider",
+                "icon": "database"
+              },
+              {
+                "title": "About PipeOps",
+                "path": "about-pipeops",
+                "icon": "info"
               }
             ]
           },
@@ -53,6 +88,17 @@
                 "title": "Integrations",
                 "path": "integrations",
                 "icon": "plug"
+              }
+            ]
+          },
+          {
+            "group": "CLI",
+            "icon": "terminal",
+            "pages": [
+              {
+                "title": "PipeOps CLI Overview",
+                "path": "cli/overview",
+                "icon": "terminal"
               }
             ]
           }
