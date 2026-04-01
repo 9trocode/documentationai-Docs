@@ -1,0 +1,159 @@
+---
+title: On Cloud Provider
+description: Provision a PipeOps server on your own cloud provider (BYOC), from choosing a provider and plan to configuring resources and starting deployments.
+---
+
+## Overview
+
+Provision a managed PipeOps server inside your own cloud account by selecting the **On Cloud Provider** option. This path keeps workloads in your infrastructure while PipeOps manages provisioning, scaling, and lifecycle.
+
+<Callout kind="info">
+
+Use this guide when you want PipeOps to run inside your own AWS, Azure, Digital Ocean, Google Cloud, or Huawei Cloud account (Bring Your Own Cloud).
+
+</Callout>
+
+## Provision a server on your cloud provider
+
+<Steps>
+
+  <Step title="Choose On Cloud Provider" icon="cloud">
+
+    In the PipeOps dashboard, start a new server and choose the **On Cloud Provider** option under cloud hosting.
+
+    This tells PipeOps that the server should run in your own cloud account instead of PipeOps-managed infrastructure.
+
+    <Image
+      src="https://files.readme.io/265e5e4-provision-server-on-cloud-provider.png"
+      alt="Provision server with the On Cloud Provider option selected"
+      width="1200"
+      height="680"
+    />
+
+  </Step>
+
+  <Step title="Connect your cloud provider" icon="plug">
+
+    Select your preferred cloud provider from the list:
+
+    - **AWS**
+    - **Azure**
+    - **Digital Ocean**
+    - **Google Cloud**
+    - **Huawei Cloud**
+
+    Then connect your account so PipeOps can provision and manage resources in your cloud. Use the **Integrations** section of the dashboard to review or update any existing cloud connections.
+
+    <Image
+      src="https://files.readme.io/b93fb70-integrations-page.png"
+      alt="Integrations page showing connected cloud providers"
+      width="1200"
+      height="680"
+    />
+
+  </Step>
+
+  <Step title="Select a plan" icon="bar-chart">
+
+    Choose a billing plan for the server. PipeOps typically offers:
+
+    - **Growth** — for smaller teams and lower traffic environments.
+    - **Scale** — for higher traffic or production workloads.
+    - **Custom** — for bespoke requirements or dedicated support.
+
+    Pick whether you want **monthly** or **yearly** billing, then confirm the pricing shown in the modal. Refer to the pricing page in the dashboard for the most up-to-date details.
+
+    <Image
+      src="https://files.readme.io/15fdca5-plan-modal.png"
+      alt="Plan selection modal with Growth, Scale, and Custom plans"
+      width="1200"
+      height="680"
+    />
+
+  </Step>
+
+  <Step title="Choose a payment method" icon="credit-card">
+
+    Add or select a payment method to cover the chosen plan. Confirm the summary and complete checkout to continue with server creation.
+
+    <Image
+      src="https://files.readme.io/4e37e09-payment-modal.png"
+      alt="Payment method selection modal"
+      width="1200"
+      height="680"
+    />
+
+  </Step>
+
+  <Step title="Create the server and choose a configuration method" icon="settings">
+
+    After payment succeeds, PipeOps moves to server creation in your connected cloud account.
+
+    1. **Select region:**  
+       Choose the cloud region where PipeOps should provision the server and its underlying resources.
+
+    2. **Pick a configuration method:**  
+       Decide how PipeOps should manage compute capacity:
+
+       - **Custom configuration** — you define environment tiers and instance categories.
+       - **Karpenter** — PipeOps leverages Karpenter to dynamically manage nodes and scaling.
+
+    <Image
+      src="https://files.readme.io/be95693-region-and-security-specification.png"
+      alt="Region and security configuration for the server"
+      width="1200"
+      height="680"
+    />
+
+    <Image
+      src="https://files.readme.io/725ec33-configuration-method.png"
+      alt="Configuration method selection between custom configuration and Karpenter"
+      width="1200"
+      height="680"
+    />
+
+  </Step>
+
+  <Step title="Configure resources" icon="database">
+
+    Configure how the server scales and what compute resources it uses. The options differ slightly depending on the configuration method you chose.
+
+    ### If you selected custom configuration
+
+    Configure separate environments and instance types for each stage of your workflow:
+
+    - **Environment tiers** — define capacity for **Development**, **Staging**, and **Production**.
+    - **Instance category** — choose the underlying instance family and size for each environment based on your workload needs.
+
+    <Image
+      src="https://files.readme.io/6139b7d-scaling-configuration.png"
+      alt="Scaling and environment configuration for custom setup"
+      width="1200"
+      height="680"
+    />
+
+    ### If you selected Karpenter
+
+    Let Karpenter manage nodes automatically while you specify high-level constraints:
+
+    - **Node architecture** — pick the architecture for your nodes (for example, x86 or ARM).
+    - **Spot instances (optional)** — enable spot instances to reduce compute costs when your workloads can tolerate potential interruptions.
+
+    <Image
+      src="https://files.readme.io/6205aeb-karpenter-configuration.png"
+      alt="Karpenter configuration showing node architecture and spot instance options"
+      width="1200"
+      height="680"
+    />
+
+  </Step>
+
+  <Step title="Proceed to project deployment" icon="rocket">
+
+    When server provisioning completes, the dashboard redirects you back to your workspace so you can deploy projects to the new server.
+
+    Continue with your standard project deployment flow in PipeOps to push your first application to this BYOC server.
+
+  </Step>
+
+</Steps>

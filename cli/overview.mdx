@@ -1,0 +1,180 @@
+---
+title: PipeOps CLI Overview
+description: Understand what the PipeOps CLI does, why to use it, and how it fits alongside the web UI, with key features, commands, and next steps.
+---
+
+## Why use the PipeOps CLI?
+
+Use the PipeOps CLI to work with PipeOps from your terminal instead of the web UI.
+
+- **Speed and efficiency**: Run commands directly from your shell without switching context.
+- **Automation**: Script deployments, project tasks, and monitoring as part of CI/CD pipelines.
+- **Developer-friendly**: Integrate with your existing tools, dotfiles, and workflows.
+- **Cross-platform**: Use the same commands on macOS, Windows, and Linux.
+- **Secure**: Authenticate with OAuth using PKCE to avoid long-lived static credentials.
+- **Rich output**: Receive structured, scriptable output for logs, status, and diagnostics.
+
+## Key features
+
+The CLI groups related operations into focused command sets so you can manage projects and infrastructure from the terminal.
+
+### Authentication and security
+
+Authenticate once and reuse secure sessions across commands.
+
+- Log in using OAuth with PKCE.
+- Store short-lived tokens securely on your machine.
+- Switch between PipeOps accounts or organizations when needed.
+- Use environment variables for non-interactive and CI flows.
+
+### Project management
+
+Manage your PipeOps projects without leaving the terminal.
+
+- Create and configure projects.
+- Select the active project context for subsequent commands.
+- View project status and metadata.
+- Work with multiple projects across environments.
+
+### Deployment operations
+
+Trigger and inspect deployments from scripts or interactive sessions.
+
+- Start new deployments for a project or environment.
+- View deployment history and current status.
+- Stream deployment logs in real time.
+- Integrate deployment steps into CI/CD pipelines.
+
+### Server management
+
+Control the servers or services managed by PipeOps.
+
+- List available servers and instances.
+- View server health and status.
+- Start, stop, or restart servers where supported.
+- Inspect server-level logs and metrics.
+
+### Agent management
+
+Manage PipeOps agents that run inside your infrastructure.
+
+- Register new agents with your PipeOps account.
+- List, label, and organize existing agents.
+- Check agent connectivity and health.
+- Rotate or revoke agent credentials.
+
+### Developer experience
+
+Work faster with CLI features designed for daily use.
+
+- Autocomplete support for commands and flags in common shells.
+- Helpful error messages and suggestions for invalid inputs.
+- Consistent command structure across categories.
+- Machine-friendly output modes for scripting.
+
+## Command categories
+
+Commands are organized into categories that reflect common workflows.
+
+- **`auth`**: Log in, log out, refresh authentication, and inspect the current session.
+- **`project`**: Create, select, and inspect projects and related configuration.
+- **`monitoring`**: List resources, check status, and view logs for deployments and servers.
+- **`server`**: Operate on servers, including lifecycle actions and status checks.
+- **`agent`**: Register and manage PipeOps agents in your infrastructure.
+- **Utilities**: Helper commands for configuration, diagnostics, and CLI version management.
+
+<Callout kind="tip">
+
+Use `--help` with any category or command to see available flags and subcommands, for example `pipeops project --help`.
+
+</Callout>
+
+## Getting started
+
+Install and configure the CLI before running commands against your projects.
+
+<Steps>
+
+<Step title="Install the PipeOps CLI" icon="download">
+
+- Download the installer or binary for your operating system from the PipeOps CLI installation guide (link in your main docs site).
+- Add the CLI to your `PATH` so you can run `pipeops` from any directory.
+- Verify the installation with `pipeops --version`.
+
+When installation succeeds, the version command prints the current CLI version.
+
+</Step>
+
+<Step title="Authenticate with PipeOps" icon="lock">
+
+- Run `pipeops auth login`.
+- Approve the OAuth request in your browser using your PipeOps account.
+- Return to the terminal and confirm that authentication completed.
+
+After login, commands that require authentication run without prompting for credentials again until the session expires.
+
+</Step>
+
+<Step title="Configure your first project" icon="settings">
+
+- Run `pipeops project list` to see existing projects tied to your account.
+- Use `pipeops project use <project-name>` to set the active project.
+- Optionally, configure defaults such as environment or region using the corresponding flags.
+
+With a project selected, deployment, monitoring, and server commands operate against that project context.
+
+</Step>
+
+</Steps>
+
+## Next steps
+
+Once the CLI is installed and authenticated, expand your usage in a few directions.
+
+- **Quick start guide**: Follow the CLI quick start guide in your main docs to run your first deployment end-to-end.
+- **Commands overview**: Explore the full command reference to discover available flags and subcommands.
+- **Advanced usage**: Learn about scripting, CI/CD integration, environment variables, and non-interactive authentication.
+- **Troubleshooting**: Use the CLI troubleshooting guide to diagnose connectivity, auth, and deployment issues.
+
+<Callout kind="info">
+
+If a guide is not available inside this repository yet, look for it in your primary PipeOps documentation site or internal wiki.
+
+</Callout>
+
+## CLI vs web UI
+
+Use both the CLI and web UI depending on the task and your workflow.
+
+<Columns cols={2}>
+
+<Card title="When to use the CLI" href="#" icon="terminal" cta="Developer workflows">
+
+- Automate deployments and monitoring in CI/CD pipelines.
+- Run repetitive tasks quickly without opening a browser.
+- Integrate with scripts, makefiles, or task runners.
+- Work locally while iterating on configuration and code.
+- Capture structured output for logs and dashboards.
+
+</Card>
+
+<Card title="When to use the web UI" href="#" icon="monitor" cta="Visual workflows">
+
+- Explore projects, resources, and metrics visually.
+- Configure settings that benefit from forms and validation.
+- Investigate complex issues with dashboards and charts.
+- Share views and status with non-technical stakeholders.
+- Perform one-off administrative tasks that are rare to script.
+
+</Card>
+
+</Columns>
+
+## Support and community
+
+Get help, report issues, and stay connected with the PipeOps team and users.
+
+- **Documentation**: Check the main PipeOps documentation site for CLI installation, command reference, and guides.
+- **GitHub**: Open issues or feature requests on the PipeOps CLI repository on GitHub.
+- **Community chat**: Join the PipeOps Slack or community workspace to ask questions and share feedback.
+- **Support**: Contact the PipeOps support team through the support portal linked from your PipeOps dashboard.

@@ -1,0 +1,72 @@
+---
+title: Choose Your Deployment Path
+description: Decide whether to deploy on PipeOps-managed hosting or on your own cloud provider account before provisioning your first server.
+---
+
+## Select where to run your infrastructure
+
+Choose whether to deploy your infrastructure on PipeOps-managed hosting or on your own cloud provider account using Bring Your Own Cloud. The path you pick determines where your servers run and how you manage billing and access.
+
+<Callout kind="info">
+
+You can switch paths for future projects at any time. Each project is bound to a single deployment path.
+
+</Callout>
+
+## Option 1: Deploy on PipeOps-managed hosting
+
+Run your servers directly on PipeOps without managing any cloud provider account. PipeOps provisions and manages the underlying infrastructure for you.
+
+Use this path if you want:
+
+- A fully managed environment with less setup
+- PipeOps to handle server provisioning and scaling
+- To get to your first deployed app as quickly as possible
+
+<Columns cols={1}>
+
+  <Card
+    title="Deploy on PipeOps"
+    href="/getting-started/choose-your-deployment-path/on-pipeops"
+    icon="cloud"
+    cta="Use PipeOps-managed hosting"
+    horizontal
+  >
+    Provision a server on PipeOps-managed hosting, with infrastructure, networking, and scaling handled for you.
+  </Card>
+
+</Columns>
+
+## Option 2: Deploy on your cloud provider (Bring Your Own Cloud)
+
+Provision servers into your own cloud account while still using PipeOps to orchestrate deployments. Bring Your Own Cloud currently supports AWS, Azure, Google Cloud, DigitalOcean, and Huawei Cloud.
+
+Choose this path if you need:
+
+- To keep infrastructure inside your own cloud accounts for governance or compliance
+- Direct access to provider-level features and billing
+- Integration with existing AWS, Azure, GCP, DigitalOcean, or Huawei Cloud resources
+
+<Columns cols={1}>
+
+  <Card
+    title="Deploy on your cloud provider"
+    href="/getting-started/choose-your-deployment-path/on-cloud-provider"
+    icon="database"
+    cta="Use Bring Your Own Cloud"
+    horizontal
+  >
+    Connect your AWS, Azure, Google Cloud, DigitalOcean, or Huawei Cloud account and let PipeOps provision servers within it.
+  </Card>
+
+</Columns>
+
+## How to choose the right path
+
+Match your situation to the option that fits best:
+
+- **New to infrastructure or testing PipeOps**: Start with PipeOps-managed hosting to avoid cloud account setup.
+- **Existing cloud contracts or strict compliance**: Use Bring Your Own Cloud so resources stay in your AWS, Azure, GCP, DigitalOcean, or Huawei Cloud account.
+- **Mixed use**: Use PipeOps-managed hosting for experiments and non-critical workloads, and Bring Your Own Cloud for production.
+
+Once you decide, continue with the detailed guide for your path to provision your first server.
