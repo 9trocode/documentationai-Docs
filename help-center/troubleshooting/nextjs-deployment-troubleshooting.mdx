@@ -1,0 +1,271 @@
+---
+title: Troubleshoot Next.js deployment issues
+description: Diagnose and fix common Next.js deployment problems on PipeOps, including Firebase key parsing, 503 errors from Node versions, and missing images.
+---
+
+## Common issues
+
+Deploying a Next.js app on PipeOps can fail in subtle ways even when the build appears successful. This page focuses on recurring patterns and how to fix them quickly.
+
+The most common Next.js deployment issues are:
+
+- Firebase private key PEM parse errors during build or at runtime
+- 503 errors after a successful deployment, often due to an incompatible Node.js version
+- Images not rendering in production while working locally
+
+Use the sections below to match symptoms to fixes, then run through the additional checks if the problem persists.
+
+<Callout kind="info">
+
+If your deployment fails outright before any of these symptoms, start with [Failed Deployment](/help-center/troubleshooting/failed-deployment) and come back here if the issue is specific to Next.js.
+
+</Callout>
+
+## Fixes
+
+### Fix Firebase private key PEM parse errors
+
+Firebase Admin SDK expects a properly formatted PEM key with actual newlines. When you store the private key in an environment variable, those newlines often need to be escaped.
+
+You might see errors like:
+
+- `error:0906D06C:PEM routines:PEM_read_bio:no start line`
+- `Failed to parse private key`
+
+#### 1. Store the private key with escaped newlines
+
+Convert the multiline key to a single line where each newline becomes `\\n`, then store that value in your environment variable (for example, `FIREBASE_PRIVATE_KEY`) in the PipeOps dashboard or config.
+
+Example value stored in PipeOps (one line):
+
+```bash
+-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASC...\n-----END PRIVATE KEY-----\n
+```
+
+#### 2. Restore newlines at runtime
+
+In your Next.js code where you initialize Firebase, replace the escaped newlines with real ones:
+
+```ts
+import admin from "firebase-admin";
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY
+        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+        : undefined
+    })
+  });
+}
+```
+
+After this change, redeploy on PipeOps. The deployment and runtime logs should no longer show PEM parsing errors.
+
+<Callout kind="tip">
+
+Apply the same `replace(/\\n/g, "\n")` pattern to any other multiline secrets stored in environment variables, such as other service account keys.
+
+</Callout>
+
+### Fix 503 errors caused by Node.js version
+
+Sometimes the deployment succeeds, but hitting your app URL returns a 503 error. If your logs show messages related to Node.js, or if your project targets a modern Next.js version, the cause is often an outdated Node runtime.
+
+Recent Next.js versions require Node.js `>= 18.17.0`. If the app runs on Node 16 (for example, `16.16.0`), the runtime can fail even though the build passed.
+
+Use this procedure to change the framework and build method so your app runs with a compatible Node version.
+
+<Steps>
+
+<Step title="Open your project in PipeOps" icon="folder">
+
+- Go to your PipeOps dashboard.
+- Select the workspace and project that contains your Next.js deployment.
+- Open the environment or deployment configuration for the failing app.
+
+</Step>
+
+<Step title="Update framework and build method" icon="settings">
+
+- Find the **framework** setting for the app.
+- Change the framework to **Other (Frontend Framework)**.
+- Locate the **build method** or builder option.
+- Set the build method to **Nixpack**.
+
+</Step>
+
+<Step title="Redeploy and verify" icon="play-circle">
+
+- Trigger a new deployment from the PipeOps dashboard.
+- Wait for the build and deployment to complete.
+- Open the app URL again:
+  - A successful fix returns your Next.js app instead of a 503 page.
+  - Check runtime logs to confirm the Node version is at least `18.17.0` and no Node-related errors appear.
+
+</Step>
+
+</Steps>
+
+<Callout kind="alert">
+
+If you explicitly set a Node version in `package.json` via the `engines` field, make sure it is compatible with your Next.js version (for example, `>=18.17.0`) so the runtime and your app agree on the required Node version.
+
+</Callout>
+
+### Fix images not visible in production
+
+If your app builds and loads but images are missing or broken in production (while working locally), the missing `sharp` dependency is a common cause. Next.js uses `sharp` for image optimization in many environments.
+
+#### 1. Add `sharp` to your dependencies
+
+Install `sharp` and save it as a production dependency:
+
+```bash
+npm install sharp
+# or
+yarn add sharp
+# or
+pnpm add sharp
+```
+
+Confirm that `sharp` appears under `dependencies` in your `package.json`, not only `devDependencies`.
+
+#### 2. Redeploy the app on PipeOps
+
+Redeploy your Next.js app so the new dependency is built into the image:
+
+- Start a new deployment from the PipeOps dashboard.
+- Wait for the build to complete successfully.
+- Reload your app in the browser:
+  - Images that previously appeared blank or broken should now render correctly.
+  - If images are still missing, check your `next.config.js` `images` configuration and the image domains.
+
+<Callout kind="tip">
+
+If you use remote images, verify that the domains are listed in `images.domains` in `next.config.js`. Incorrect or missing domains can also cause images to be blocked.
+
+</Callout>
+
+## Additional checks
+
+If the fixes above do not resolve your issue, walk through these checks to surface configuration or environment problems.
+
+### Verify environment variables
+
+Many Next.js issues in production come from missing or misconfigured environment variables.
+
+<Steps>
+
+<Step title="Confirm variables in PipeOps" icon="terminal">
+
+- Open the environment configuration for your deployment in PipeOps.
+- Check all required variables for your Next.js app (API URLs, keys, secrets, Firebase config, etc.).
+- Make sure variable names match exactly what your code expects, including casing.
+
+</Step>
+
+<Step title="Check values and formats" icon="info">
+
+- Ensure values match the format your code assumes:
+  - Multiline secrets use escaped newlines `\\n` and are converted at runtime.
+  - URLs include the correct protocol (for example, `https://api.acme-pay.com`).
+- Avoid trailing spaces or accidental quotes in values.
+
+</Step>
+
+<Step title="Redeploy after changes" icon="play-circle">
+
+- Save environment changes.
+- Trigger a new deployment so the updated variables are available at runtime.
+- Confirm in logs or debugging output that `process.env` values are present.
+
+</Step>
+
+</Steps>
+
+### Review build and runtime logs
+
+Logs usually pinpoint why a deployment or runtime request is failing.
+
+- Inspect **build logs** for:
+  - TypeScript or ESLint failures
+  - Failed imports or module resolution issues
+  - Out-of-memory or timeout errors
+- Inspect **runtime logs** for:
+  - Uncaught exceptions on startup
+  - Failed external service calls
+  - Errors triggered only under production configuration
+
+<Callout kind="info">
+
+Look for stack traces or messages that only appear in production. Differences from local logs often indicate environment or config mismatches rather than code bugs.
+
+</Callout>
+
+### Validate Next.js configuration
+
+Misconfigured `next.config.js` can cause unexpected behavior after deployment.
+
+Check the following:
+
+- **Base path and asset prefix**:
+  - If you set `basePath` or `assetPrefix`, confirm routes and static assets load correctly on your PipeOps URL.
+- **Image configuration**:
+  - Confirm `images.domains` includes all remote domains.
+  - Check any custom loaders and ensure they work in the deployed environment.
+- **Experimental flags**:
+  - Turn off experimental features one by one if you suspect instability in production.
+
+### Ensure sufficient resources
+
+If your app uses a lot of memory or CPU during build or at runtime, under-sized resources can cause slow responses, 5xx errors, or build failures.
+
+- Review resource usage metrics (CPU, memory) for your deployment.
+- Consider:
+  - Increasing instance size or memory limits.
+  - Reducing build-time work (for example, heavy API calls or pre-rendering large datasets).
+  - Enabling caching or pagination to reduce load.
+
+### Update dependencies
+
+Outdated or incompatible dependencies often behave differently in a containerized environment.
+
+- Upgrade to a supported Next.js version that matches your Node runtime.
+- Update frameworks and packages that integrate with Next.js (authentication, CMS, analytics).
+- Rerun a local production build (`next build` and `next start`) before deploying to PipeOps to catch issues early.
+
+### Check external connectivity and ports
+
+If your app depends on external services, verify that those services are reachable from the deployed environment.
+
+- Confirm external API endpoints, databases, and queues are accessible from your PipeOps environment.
+- Make sure your app listens on the expected port in production (usually provided via an environment variable like `PORT`).
+- Validate that any required outbound ports or protocols are allowed.
+
+### Confirm build scripts
+
+Finally, verify that your build commands are correct and aligned with your Next.js version.
+
+- Ensure your build script in `package.json` uses:
+
+  ```json
+  {
+    "scripts": {
+      "build": "next build",
+      "start": "next start"
+    }
+  }
+  ```
+
+- If you use custom build or start commands, confirm:
+  - They do not rely on local-only tools.
+  - They run successfully in a fresh environment.
+
+<Callout kind="tip">
+
+If you recently migrated from another platform, review any previous platform-specific scripts or environment assumptions. Remove or adapt them to match how PipeOps builds and runs your Next.js app.
+
+</Callout>

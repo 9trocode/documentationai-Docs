@@ -1,0 +1,135 @@
+---
+title: 502 Bad Gateway
+description: Fix 502 Bad Gateway errors for your deployed PipeOps app by aligning HOST/PORT configuration, redeploying, and checking runtime logs.
+---
+
+## Symptoms
+
+- Opening your app URL returns `502 Bad Gateway`
+- Health checks or preview links in PipeOps fail with a 502 error
+- The deployment shows as successful, but the app is not reachable
+
+## Likely causes
+
+A 502 Bad Gateway error usually means PipeOps cannot reach your running app on the host and port it expects.
+
+Common causes include:
+
+- The app listens on a different port than the one configured in PipeOps
+- The `PORT` environment variable in PipeOps does not match the port your app actually uses
+- The app is bound to `127.0.0.1` or `localhost` instead of `0.0.0.0`
+- The Dockerfile exposes a different port than the app listens on
+
+## Resolution
+
+<Steps>
+  <Step title="Confirm the port your app listens on" icon="terminal">
+
+    Check which port the app process uses inside your codebase or Docker setup.
+
+    - **Non-Docker app**: Look for where your server starts, for example:
+
+      ```javascript
+      const port = process.env.PORT || 3000
+      app.listen(port, () => {
+        console.log(`Server running on port ${port}`)
+      })
+      ```
+
+      In this case, the app listens on port `3000` (or whatever `PORT` is at runtime).
+
+    - **Dockerized app**: Open your `Dockerfile` and check the `EXPOSE` instruction and the command that starts the server:
+
+      ```docker
+      FROM node:18-alpine
+      WORKDIR /usr/src/app
+      COPY package*.json ./
+      RUN npm install --production
+      COPY . .
+      EXPOSE 8080
+      CMD ["npm", "start"]
+      ```
+
+      Here, the container is expected to listen on port `8080`. Make sure your app code actually listens on this same port.
+
+  </Step>
+
+  <Step title="Set HOST and PORT environment variables in PipeOps" icon="settings">
+
+    Open your project in the PipeOps dashboard and go to the environment or settings where you configure variables for this deployment.
+
+    - Set **`HOST`** to `0.0.0.0`
+    - Set **`PORT`** to the exact port your app listens on (from Step 1), for example `3000` or `8080`
+
+    If `PORT` was already set but did not match your app's listening port, update it to the correct value.
+
+    <Callout kind="tip">
+
+    Many frameworks default to `localhost` or `127.0.0.1`. Binding to `0.0.0.0` ensures the app accepts connections from outside the container, which PipeOps needs to route traffic correctly.
+
+    </Callout>
+
+  </Step>
+
+  <Step title="Save changes and trigger a new deployment" icon="play-circle">
+
+    After updating `HOST` and `PORT`, save your environment variables in the PipeOps dashboard.
+
+    Saving the variables should trigger a new deployment. If it does not start automatically, manually redeploy the app from the project view.
+
+    Wait for the deployment to finish and confirm it shows a successful status before testing again.
+
+  </Step>
+</Steps>
+
+## Verify the fix
+
+Use these checks to confirm the 502 error is resolved:
+
+- Open the app URL from the PipeOps dashboard; the app should now load without a 502 response
+- If your app logs startup messages, you should see something like `Server running on port 3000` or similar in the latest deployment logs
+- Health checks or preview links should show HTTP 200 responses instead of 502
+
+If the app still returns 502, double-check that:
+
+- `PORT` in PipeOps matches the actual listening port from your code or Dockerfile
+- The app binds to `0.0.0.0` and not `localhost` or `127.0.0.1`
+- The deployment you are testing is the latest one with the updated variables
+
+## Where to look next
+
+If you still see 502 Bad Gateway after verifying the steps above, inspect the runtime logs to pinpoint the issue.
+
+<Steps>
+  <Step title="Open logs for the latest deployment" icon="book-open">
+
+    - Go to your project in the PipeOps dashboard
+    - Open the **Logs** or **Deployments** section
+    - Select the most recent deployment and view its logs
+
+  </Step>
+
+  <Step title="Confirm HOST and PORT at runtime" icon="info">
+
+    Look for log lines from your app that mention the port and host it is using. For example:
+
+    ```text
+    Server listening on http://0.0.0.0:8080
+    ```
+
+    If the logs show a different port than your `PORT` variable, or a host like `127.0.0.1`, update your app or environment variables to match, then redeploy.
+
+  </Step>
+
+  <Step title="Check for app-level errors" icon="alert-triangle">
+
+    If HOST and PORT look correct, scan the logs for:
+
+    - Startup errors (missing dependencies, database connection failures)
+    - Crashes right after start
+    - Framework-specific errors that prevent the server from binding to the configured port
+
+    Fix those issues in your app code or configuration, commit the changes, and redeploy through PipeOps.
+
+  </Step>
+</Steps>

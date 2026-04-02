@@ -1,0 +1,216 @@
+---
+title: JavaScript deployment troubleshooting
+description: Diagnose and fix common JavaScript deployment issues on PipeOps, including missing files, broken images, and deployments not triggering from GitHub.
+---
+
+## Common issues
+
+JavaScript deployments on PipeOps usually fail or misbehave in a few repeatable ways that you can fix quickly once you know what to look for.
+
+### Files are not rendering in the browser
+
+Your app deploys without errors, but when you open the URL, some pages or scripts do not load, or you see console errors related to missing files or incorrect mimetypes.
+
+Common symptoms:
+
+- Blank page or partially rendered UI
+- Network panel shows 404 or mime-type errors for JS files
+- Only the main `index.html` loads, but interactivity is broken
+
+### Images are not visible
+
+The app loads, but images do not appear even though they exist in your repository.
+
+Common symptoms:
+
+- Broken image icons in the browser
+- Image URLs return 404 or 500 responses
+- Static assets directory looks correct, but nothing shows in production
+
+### Project is not autodeploying from GitHub
+
+You push new commits to the connected branch, but PipeOps does not start a new deployment automatically.
+
+Common symptoms:
+
+- No new deployments appear after a commit
+- Manual deployments work, but automatic ones never start
+- The repository is connected, but GitHub checks do not show PipeOps
+
+## Fixes
+
+Use these targeted fixes for each issue pattern. After each fix, trigger a new deployment and verify the app URL again.
+
+### Fix file rendering and mimetype issues
+
+Restricted keywords in file or directory names can cause a mimetype bug that prevents JavaScript files from loading correctly. Moving script logic into inline code in `index.html` also avoids these issues for static sites.
+
+<Steps>
+
+<Step title="Rename files and directories with restricted keywords" icon="edit">
+
+- Scan your project for directories and files with restricted or reserved words that might conflict with the platform or web server. Examples include `api`, `server`, `backend`, `admin`, and similar framework- or platform-reserved names.
+- Rename those directories and files to neutral names, such as `web-api` to `api-service`, or `admin` to `dashboard-admin`.
+- Update any imports and references in your code so they match the new names.
+
+After renaming, run your app locally to confirm it still builds and runs without missing-module errors.
+
+</Step>
+
+<Step title="Move public JavaScript into inline scripts in index.html" icon="code">
+
+- Open your `index.html` (or main HTML entry file) in the public directory.
+- Locate `<script src="...">` tags that reference JavaScript files inside the public directory, such as `public/scripts/app.js` or similar.
+- Copy the JavaScript code from these referenced files.
+- Replace the external `<script src="...">` tags with inline script tags in `index.html`, for example:
+
+  ```html
+  <!-- Before -->
+  <script src="/scripts/app.js"></script>
+
+  <!-- After -->
+  <script>
+    // Paste your app.js content here
+    console.log("App loaded");
+  </script>
+  ```
+
+- Save the file and remove the now-unreferenced public JS files if they are no longer needed.
+
+This change ensures the browser loads your scripts directly from the HTML without hitting the mimetype bug on static assets.
+
+</Step>
+
+<Step title="Redeploy and verify" icon="play-circle">
+
+- Commit your changes to the repository branch connected to PipeOps.
+- Wait for PipeOps to pick up the commit and complete the deployment, or trigger a manual deployment if needed.
+- Open the deployment URL and check:
+
+  - The page renders fully
+  - The browser console shows no mime-type or missing-file errors
+  - Interactive features work as expected
+
+</Step>
+
+</Steps>
+
+### Fix images not visible in production
+
+Missing image processing dependencies can cause images to fail at build or runtime, especially in Node-based frameworks that optimize images.
+
+<Steps>
+
+<Step title="Install the sharp image library" icon="download">
+
+- Add `sharp` as a dependency in your project:
+
+  ```bash
+  npm install sharp
+  # or
+  yarn add sharp
+  ```
+
+- Ensure `sharp` appears in your `package.json` under `dependencies` (not only `devDependencies`) so it is available in the production build.
+
+</Step>
+
+<Step title="Redeploy the application" icon="play-circle">
+
+- Commit the updated `package.json` and lockfile.
+- Push to the connected branch so PipeOps triggers a new deployment.
+- After the deployment completes, refresh your app URL and verify that images now render correctly across your pages.
+
+</Step>
+
+</Steps>
+
+### Fix project not autodeploying on new commits
+
+Automatic deployments depend on the PipeOps GitHub App receiving push events from your repository.
+
+<Steps>
+
+<Step title="Verify the PipeOps GitHub App is installed" icon="github">
+
+- Visit the PipeOps GitHub App installation page:  
+  `https://github.com/apps/pipeops/installations/select_target`
+- Confirm that:
+
+  - The app is installed on your GitHub account or organization.
+  - The correct repository (or the entire organization) is selected for access.
+
+- If the app is not installed or the repository is missing, complete the installation and grant access to the target repository.
+
+</Step>
+
+<Step title="Confirm repository connection in PipeOps" icon="settings">
+
+- In the PipeOps dashboard, open your project.
+- Check the connected repository and branch configuration.
+- Make sure the repository listed matches the one you installed the GitHub App on, and the branch is the one you are pushing to.
+
+</Step>
+
+<Step title="Push a test commit and verify deployment" icon="play-circle">
+
+- Make a small, safe change in your project, such as updating a comment or README text.
+- Commit and push to the configured branch.
+- Watch the PipeOps dashboard to confirm that a new deployment starts automatically.
+- Once the deployment completes, verify that the changes appear on your app URL.
+
+</Step>
+
+</Steps>
+
+## Additional checks
+
+If the specific fixes above do not resolve your issue, walk through these broader checks to rule out configuration and environment problems.
+
+<Callout kind="tip">
+
+Work through these checks from top to bottom. Many intermittent deployment issues come from configuration drift, outdated dependencies, or missing environment settings.
+
+</Callout>
+
+### Environment variables and secrets
+
+Ensure the runtime has everything your app expects.
+
+- Confirm all required environment variables are set in PipeOps for the current environment.
+- Verify that variable names and values exactly match what your app reads.
+- Avoid hard-coding secrets in source; use PipeOps environment management instead.
+
+### Logs and build output
+
+Review logs to identify failing steps or runtime errors.
+
+- Open the latest deployment in the PipeOps dashboard and inspect build logs.
+- Look for failed build steps, missing modules, or file-system errors.
+- Check runtime logs for Node apps for errors when handling requests or loading static files.
+
+### Configuration files
+
+Misconfigured framework or build settings can break JavaScript and assets.
+
+- Validate key config files such as `package.json`, framework configs, and static build settings.
+- Confirm the `build` or `start` scripts in `package.json` match what your framework expects.
+- Ensure your build output directory matches what PipeOps is configured to serve for static deployments.
+
+### Resources and dependencies
+
+Under-provisioned resources or outdated packages can cause subtle failures.
+
+- Confirm your app has sufficient memory and CPU for builds and runtime, especially for heavy bundling or image processing.
+- Update critical dependencies, including your framework, bundler, and build tooling.
+- Rebuild locally with the same `build` script PipeOps runs to catch issues before deploying.
+
+### Network and external services
+
+Network or third-party issues sometimes present as deployment or runtime problems.
+
+- Check that required external services (databases, APIs, storage) are reachable from your deployment environment.
+- Verify that any required ports, URLs, or endpoints are correctly configured and accessible.
+- Monitor external service status pages if your app depends on third-party APIs.
+
+If you still see issues after these checks, capture recent deployment logs and configuration details and share them with PipeOps support so they can pinpoint the root cause faster.

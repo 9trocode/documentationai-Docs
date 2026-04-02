@@ -1,0 +1,80 @@
+---
+title: No Buildpack Detected
+description: Fix No Buildpack Detected deployment errors in PipeOps by checking project structure, buildpack configuration, and local builds.
+---
+
+## Symptoms
+
+- Deployment fails during the build phase
+- Logs show `No Buildpack Detected` or similar messages
+- No Docker image is produced for your app
+
+## Likely causes
+
+- Missing required project files such as `manifest.yml`, `Dockerfile`, `Procfile`, or `buildpacks.toml`
+- Project structure does not match what the selected buildpack expects
+- Selected buildpack is not supported or does not match your app language/runtime
+- Code or dependencies prevent the buildpack from detecting and building the app
+
+## Resolution
+
+<Steps>
+  <Step title="Check project structure and required files">
+
+Verify that your repository includes the files expected for your stack:
+
+- For buildpacks-based apps: `buildpacks.toml` and any language-specific files the buildpack requires
+- For process-based apps: a `Procfile` defining how to run your app
+- For manifest-driven apps: a `manifest.yml` describing the app
+- For container builds: a valid `Dockerfile` at the repository root
+
+If any of these apply to your app type and are missing or misnamed, add or fix them, then commit the changes.
+
+  </Step>
+
+  <Step title="Confirm the correct buildpack selection">
+
+If you configured buildpacks for the app, confirm they match your language and framework.
+
+- Use a supported buildpack for your runtime (for example, Node.js, Python, Java)
+- Remove buildpacks that do not apply to your project
+- If you rely on automatic detection, ensure your project layout and files match what that buildpack expects
+
+Update the buildpack configuration in PipeOps or in `buildpacks.toml`, then push your changes.
+
+  </Step>
+
+  <Step title="Build and run the app locally">
+
+Before redeploying, run a local build using the same configuration:
+
+- For buildpacks: run the buildpack tooling locally (or use a local container build) with your `buildpacks.toml`
+- For Docker: run `docker build .` and then `docker run` using the built image
+- For Procfile or manifest-based apps: start the app locally using the defined process or manifest
+
+Fix any errors that appear during the local build or startup until your app builds and runs successfully.
+
+  </Step>
+
+  <Step title="Redeploy on PipeOps">
+
+After confirming a successful local build:
+
+- Push your latest commits to the branch PipeOps deploys from
+- Trigger a new deployment in PipeOps
+- Watch the build logs to confirm that a buildpack is detected and the image is created
+
+If the build succeeds, allow the deployment to complete and verify the app is healthy.
+
+  </Step>
+</Steps>
+
+## Verify the fix
+
+After the new deployment finishes:
+
+- The deployment status in PipeOps shows as successful, not failed
+- Build logs no longer contain `No Buildpack Detected`
+- Your app responds correctly on its configured URL
+
+If the error persists, compare the PipeOps build logs with your local build output and adjust the project files or buildpack configuration again before redeploying.

@@ -1,0 +1,90 @@
+---
+title: Unexpected AWS bills after deleting a server
+description: Resolve unexpected AWS charges after deleting a PipeOps server by checking for lingering resources in your AWS account and preventing future issues.
+---
+
+## Symptoms
+
+- You deleted a server from PipeOps, but AWS bills still show ongoing charges
+- AWS cost breakdown shows EC2, load balancer, or storage costs linked to the deleted server
+- Charges continue over multiple billing cycles after the server removal in PipeOps
+
+## Why this happens
+
+Deleting a server in PipeOps normally triggers cleanup of the AWS resources created for that server.
+
+If the AWS account was disconnected from PipeOps **before** you deleted the server, PipeOps cannot access AWS to remove those resources. The server disappears from the PipeOps UI, but some AWS resources (such as EC2 instances, load balancers, EBS volumes, and security groups) may keep running and continue to generate charges.
+
+These resources live entirely in your AWS account, so you must remove them directly in the AWS console to stop further billing.
+
+<Callout kind="alert">
+
+Terminating AWS resources permanently deletes any data on those resources, such as data on EBS volumes or state stored on EC2 instances. Confirm that you no longer need the data, or create backups and snapshots first.
+
+</Callout>
+
+## Resolution
+
+Use these steps to find and clean up lingering AWS resources related to the deleted PipeOps server.
+
+<Steps>
+  <Step title="Identify the affected AWS region">
+
+  - Sign in to the AWS Management Console.
+  - From the top-right region selector, choose the region where PipeOps originally provisioned the server (for example, `us-east-1` or `eu-west-1`).
+  - If you are unsure, check your AWS billing cost explorer for the region with the highest recent usage related to the deleted server.
+
+  </Step>
+
+  <Step title="Check for running EC2 instances">
+
+  - Open the EC2 service in the AWS console.
+  - In the Instances list, filter for recently running instances around the time you deleted the PipeOps server.
+  - Look for instances whose names, tags, or security groups match the project or environment name you used in PipeOps.
+  - For any instance you are sure is no longer needed, stop it first to confirm nothing breaks, then terminate it to stop ongoing charges.
+
+  </Step>
+
+  <Step title="Review load balancers and networking">
+
+  - In EC2, check **Load Balancers** for any application or network load balancers that were created for the deleted server.
+  - Inspect associated target groups and listeners to confirm they are unused.
+  - Delete unused load balancers and their target groups after confirming they are not routing traffic for any active application.
+
+  </Step>
+
+  <Step title="Clean up EBS volumes and snapshots">
+
+  - From the EC2 console, open the **Volumes** section.
+  - Look for unattached EBS volumes that previously belonged to the terminated instances.
+  - Verify that you no longer need the data on these volumes (or that you have snapshots/backups).
+  - Delete unused volumes to stop storage charges.
+  - Optionally, review **Snapshots** and remove snapshots you no longer need to reduce storage costs further.
+
+  </Step>
+
+  <Step title="Check security groups and other resources">
+
+  - In EC2, open **Security Groups** and look for groups that were used only by the deleted server.
+  - For security groups no longer attached to any active instances or load balancers, delete them.
+  - If your setup used other AWS services (such as RDS databases, ElastiCache, or S3 buckets) that were manually created, review those services as well and deprovision anything you are certain is no longer required.
+
+  </Step>
+
+  <Step title="Monitor AWS billing to confirm resolution">
+
+  - Open the AWS Billing dashboard and review **Cost Explorer** for the next few days and into the next billing cycle.
+  - Verify that EC2, load balancer, and EBS-related charges drop after you remove the unused resources.
+  - If costs remain unexpectedly high, cross-check other AWS services (for example, RDS, S3, or managed caches) that might still be running outside of PipeOps control.
+
+  </Step>
+</Steps>
+
+## Prevention
+
+Avoid future unexpected AWS bills by keeping server lifecycle and account connections aligned.
+
+- **Do not disconnect AWS while servers are active.** Keep your AWS account connected to PipeOps while you still have running servers, so PipeOps can fully clean up infrastructure when you delete a server.
+- **Always delete servers from PipeOps first.** Use the PipeOps UI or workflows to delete servers before changing or revoking AWS credentials or removing the integration.
+- **Periodically review AWS resources.** Even when PipeOps handles cleanup, periodically scan EC2 instances, load balancers, and EBS volumes to catch any manually created or legacy resources.
+- **Monitor billing regularly.** Use AWS Cost Explorer and billing alerts to catch unexpected cost trends quickly, so you can investigate and remediate before they grow.
